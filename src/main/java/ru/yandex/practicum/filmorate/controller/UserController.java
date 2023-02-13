@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
+    public User create(@Valid @RequestBody User user) throws ValidationException {
         validate(user);
         genId++;
         if (user.getId() == 0) {
@@ -49,10 +50,10 @@ public class UserController {
     }
 
     private void validate(User user) throws ValidationException {
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+        /*if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.error("Электронная почта не может быть пустой и должна содержать символ @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
+        }*/
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             log.error("Логин не может быть пустым и содержать пробелы");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
@@ -61,10 +62,10 @@ public class UserController {
             log.warn("Имя для отображения может быть пустым — в таком случае будет использован логин;");
             user.setName(user.getLogin());
         }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        /*if (user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
-        }
+        }*/
     }
 
 

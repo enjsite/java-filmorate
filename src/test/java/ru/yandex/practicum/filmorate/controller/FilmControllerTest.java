@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,26 +47,6 @@ class FilmControllerTest {
 
         filmController.create(film);
         assertTrue(filmController.findAll().contains(film));
-    }
-
-    @Test
-    void createFailName() {
-        Film film = new Film(3,"", "Film description 3",
-                LocalDate.of(2000,1,1), 120);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Название не может быть пустым", exception.getMessage());
-        assertFalse(filmController.findAll().contains(film));
-    }
-
-    @Test
-    void createFailDescription() {
-        Film film = new Film(3,"Test Film", "Пятеро друзей ( комик-группа «Шарло»), приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия», стал кандидатом Коломбани.",
-                LocalDate.of(2000,1,1), 120);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
-        assertEquals("Максимальная длина описания — 200 символов", exception.getMessage());
-        assertFalse(filmController.findAll().contains(film));
     }
 
     @Test

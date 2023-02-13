@@ -68,26 +68,6 @@ class UserControllerTest {
     }
 
     @Test
-    void createFailEmail() {
-        User user = new User(3, "Maria", "masha.gmail.com", "mashas",
-                LocalDate.of(2000,1,1));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
-        assertFalse(userController.findAll().contains(user));
-    }
-
-    @Test
-    void createFailBirthday() {
-        User user = new User(3, "Maria", "masha@gmail.com", "mashas",
-                LocalDate.of(2024,1,1));
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
-        assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
-        assertFalse(userController.findAll().contains(user));
-    }
-
-    @Test
     void update() throws ValidationException {
 
         user1.setName("Godzilla");

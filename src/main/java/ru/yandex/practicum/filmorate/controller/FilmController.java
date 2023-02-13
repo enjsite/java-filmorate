@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class FilmController {
     }
 
     @PostMapping(value = "/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
         validate(film);
         genId++;
         if (film.getId() == 0) {
@@ -49,14 +50,14 @@ public class FilmController {
     }
 
     private void validate(Film film) throws ValidationException {
-        if (film.getName() == null || film.getName().isEmpty()) {
+        /*if (film.getName() == null || film.getName().isEmpty()) {
             log.error("Название не может быть пустым");
             throw new ValidationException("Название не может быть пустым");
-        }
-        if (film.getDescription().length() > 200) {
+        }*/
+        /*if (film.getDescription().length() > 200) {
             log.error("Максимальная длина описания — 200 символов");
             throw new ValidationException("Максимальная длина описания — 200 символов");
-        }
+        }*/
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
