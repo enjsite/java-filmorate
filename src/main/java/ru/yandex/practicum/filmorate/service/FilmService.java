@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
@@ -27,8 +28,13 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public Film get(Integer id) throws ValidationException {
-        return filmStorage.get(id);
+    public Film get(Integer id) {
+        Film film = filmStorage.get(id);
+        if (film == null) {
+            log.error("Не существует фильма с id " + id);
+            throw new NullPointerException("Не существует фильма с id " + id);
+        }
+        return film;
     }
 
     public Film create(Film film) throws ValidationException {
@@ -37,8 +43,11 @@ public class FilmService {
     }
 
     public Film update(Film film) throws ValidationException {
-        validate(film);
-        filmStorage.update(film);
+        Film curFilm = get(film.getId());
+        if (curFilm != null) {
+            validate(film);
+            filmStorage.update(film);
+        }
         return film;
     }
 
@@ -53,12 +62,14 @@ public class FilmService {
         }
     }
 
-    public void addLike(Integer filmId, Integer userId) throws ValidationException {
-        filmStorage.addLike(filmId, userId);
+    public void addLike(Integer filmId, Integer userId) {
+        Film film = get(filmId);
+        filmStorage.addLike(film, userId);
     }
 
-    public void deleteLike(Integer filmId, Integer userId) throws ValidationException {
-        filmStorage.deleteLike(filmId, userId);
+    public void deleteLike(Integer filmId, Integer userId) {
+        Film film = get(filmId);
+        filmStorage.deleteLike(film, userId);
     }
 
     public List<Film> popular(Integer count) {

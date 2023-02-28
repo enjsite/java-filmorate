@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -19,8 +18,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User get(Integer id) {
         if (!users.containsKey(id)) {
-            log.error("Не существует пользователя с id " + id);
-            throw new NullPointerException("Не существует пользователя с id " + id);
+            return null;
         }
         return users.get(id);
     }
@@ -37,11 +35,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) throws ValidationException {
-        if (get(user.getId()) != null) {
-            users.put(user.getId(), user);
-            log.info("User c id " + user.getId() + " обновлен.");
-        }
+    public User update(User user)  {
+        users.put(user.getId(), user);
+        log.info("User c id " + user.getId() + " обновлен.");
         return user;
     }
 
@@ -56,21 +52,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(Integer userId, Integer friendId) throws ValidationException {
-        User user = get(userId);
-        User friend = get(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+    public void addFriend(User user, User friend) {
+        user.getFriends().add(friend.getId());
+        friend.getFriends().add(user.getId());
         update(user);
         update(friend);
     }
 
     @Override
-    public void deleteFriend(Integer userId, Integer friendId) throws ValidationException {
-        User user = get(userId);
-        User friend = get(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
+    public void deleteFriend(User user, User friend) {
+        user.getFriends().remove(friend.getId());
+        friend.getFriends().remove(user.getId());
         update(user);
         update(friend);
     }

@@ -78,4 +78,12 @@ public class FilmController {
         );
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(final Exception e) {
+        return new ErrorResponse(
+                "Возникло исключение", e.getMessage()
+        );
+    }
+
 }

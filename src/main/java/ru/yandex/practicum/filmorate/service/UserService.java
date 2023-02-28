@@ -29,8 +29,13 @@ public class UserService {
         return userStorage.findAll();
     }
 
-    public User get(Integer id) throws ValidationException {
-        return userStorage.get(id);
+    public User get(Integer id) {
+        User user = userStorage.get(id);
+        if (user == null) {
+            log.error("Не существует пользователя с id " + id);
+            throw new NullPointerException("Не существует пользователя с id " + id);
+        }
+        return user;
     }
 
     public User create(User user) throws ValidationException {
@@ -39,12 +44,12 @@ public class UserService {
     }
 
     public User update(User user) throws ValidationException {
-        if (userStorage.get(user.getId()) == null) {
-            log.error("Не существует пользователя с id " + user.getId());
-            throw new ValidationException("Не существует пользователя с id " + user.getId());
+        User curUser = get(user.getId());
+        if (curUser != null) {
+            validate(user);
+            userStorage.update(user);
         }
-        validate(user);
-        return userStorage.update(user);
+        return user;
     }
 
     public void validate(User user) throws ValidationException {
@@ -59,37 +64,39 @@ public class UserService {
         }
     }
 
-    public void addFriend(Integer userId, Integer friendId) throws ValidationException {
-        userStorage.addFriend(userId, friendId);
+    public void addFriend(Integer userId, Integer friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
+        userStorage.addFriend(user, friend);
     }
 
-    public void deleteFriend(Integer userId, Integer friendId) throws ValidationException {
-        userStorage.deleteFriend(userId, friendId);
+    public void deleteFriend(Integer userId, Integer friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
+        userStorage.deleteFriend(user, friend);
     }
 
-    public List<User> getFriends(Integer id) throws ValidationException {
-
-        User user = userStorage.get(id);
+    public List<User> getFriends(Integer id) {
+        User user = get(id);
         List<User> friends = new ArrayList<>();
         for (Integer friendId: user.getFriends()) {
-            friends.add(userStorage.get(friendId));
+            friends.add(get(friendId));
         }
         return friends;
     }
 
-    public List<User> getCommonFriends(Integer id, Integer otherId) throws ValidationException {
+    public List<User> getCommonFriends(Integer id, Integer otherId) {
 
-        User user = userStorage.get(id);
-        User otherUser = userStorage.get(otherId);
+        User user = get(id);
+        User otherUser = get(otherId);
         List<User> commonFriends = new ArrayList<>();
 
         Set<Integer> result = user.getFriends().stream()
-                .distinct()
                 .filter(otherUser.getFriends()::contains)
                 .collect(Collectors.toSet());
 
         for (Integer friendId: result) {
-            commonFriends.add(userStorage.get(friendId));
+            commonFriends.add(get(friendId));
         }
 
         return commonFriends;

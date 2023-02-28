@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 
@@ -18,8 +16,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film get(Integer id) {
         if (!films.containsKey(id)) {
-            log.error("Не существует фильма с id " + id);
-            throw new NullPointerException("Не существует фильма с id " + id);
+            return null;
         }
         return films.get(id);
     }
@@ -36,11 +33,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) throws ValidationException {
-        if (get(film.getId()) != null) {
-            films.put(film.getId(), film);
-            log.info("Film c id " + film.getId() + " обновлен.");
-        }
+    public Film update(Film film) {
+        films.put(film.getId(), film);
+        log.info("Film c id " + film.getId() + " обновлен.");
         return film;
     }
 
@@ -55,15 +50,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Integer filmId, Integer userId) throws ValidationException {
-        Film film = get(filmId);
+    public void addLike(Film film, Integer userId) {
         film.getLikes().add(userId);
         update(film);
     }
 
     @Override
-    public void deleteLike(Integer filmId, Integer userId) throws ValidationException {
-        Film film = get(filmId);
+    public void deleteLike(Film film, Integer userId) {
         if (!film.getLikes().contains(userId)) {
             log.error("Не существует лайка от пользователя с id " + userId);
             throw new NullPointerException("Не существует лайка от пользователя с id " + userId);
