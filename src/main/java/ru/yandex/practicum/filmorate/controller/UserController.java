@@ -1,72 +1,91 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    public HashMap<Integer, User> users = new HashMap<>();
-    public int genId = 0;
+    private final UserService userService;
 
-    @GetMapping(value = "/users")
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
     public List<User> findAll() {
-         return new ArrayList<>(users.values());
+         return userService.findAll();
     }
 
-    @PostMapping(value = "/users")
+    @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        validate(user);
-        genId++;
-        if (user.getId() == 0) {
-            user.setId(genId);
-        }
-        users.put(user.getId(), user);
-        log.info("User c id " + user.getId() + " добавлен.");
-        return user;
+        return userService.create(user);
     }
 
-    @PutMapping(value = "/users")
+    @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
-        if (users.containsKey(user.getId())) {
-            validate(user);
-            users.put(user.getId(), user);
-            log.info("User c id " + user.getId() + " обновлен.");
-        } else {
-            log.error("Не существует пользователя с id " + user.getId());
-            throw new ValidationException("Не существует пользователя с id " + user.getId());
-        }
-        return user;
+        return userService.update(user);
     }
 
-    private void validate(User user) throws ValidationException {
-        /*if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.error("Электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }*/
-        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.error("Логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getName() == null || user.getName().isEmpty()) {
-            log.warn("Имя для отображения может быть пустым — в таком случае будет использован логин;");
-            user.setName(user.getLogin());
-        }
-        /*if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }*/
+    @GetMapping("/{id}")
+    public User get(@PathVariable Integer id) throws ValidationException {
+        return userService.get(id);
     }
 
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws ValidationException {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws ValidationException {
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Integer id) throws ValidationException {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) throws ValidationException {
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(final ValidationException e) {
+        return new ErrorResponse(
+                "Ошибка валидации", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(final NullPointerException e) {
+        return new ErrorResponse(
+                "Объект не найден", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(final Exception e) {
+        return new ErrorResponse(
+                "Возникло исключение", e.getMessage()
+        );
+    }
 
 }

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,12 +22,12 @@ class UserControllerTest {
     @BeforeEach
     void init() throws ValidationException {
 
-        userController = new UserController();
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
 
         user1 = new User(1, "Maria", "masha@gmail.com", "mashas",
-                LocalDate.of(2000,1,1));
+                LocalDate.of(2000,1,1), null);
         user2 = new User(2, "Ivan", "ivan@gmail.com", "zerrro",
-                LocalDate.of(1990,1,1));
+                LocalDate.of(1990,1,1), null);
 
         userController.create(user1);
         userController.create(user2);
@@ -43,7 +45,7 @@ class UserControllerTest {
     @Test
     void create() throws ValidationException {
         User user = new User(3, "Maria", "masha@gmail.com", "mashas",
-                LocalDate.of(2000,1,1));
+                LocalDate.of(2000,1,1), null);
 
         userController.create(user);
         assertTrue(userController.findAll().contains(user));
@@ -60,7 +62,7 @@ class UserControllerTest {
     @Test
     void createFailLogin() {
         User user = new User(3, "Maria", "masha@gmail.com", "",
-                LocalDate.of(2000,1,1));
+                LocalDate.of(2000,1,1), null);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception.getMessage());
@@ -84,9 +86,9 @@ class UserControllerTest {
     void updateUnknown() {
 
         User userUpd = new User(9999, "Maria", "masha@gmail.com", "mashas",
-                LocalDate.of(2000,1,1));
+                LocalDate.of(2000,1,1), null);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.update(userUpd));
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> userController.update(userUpd));
         assertEquals("Не существует пользователя с id 9999", exception.getMessage());
 
         List<Integer> ids = new ArrayList<>();

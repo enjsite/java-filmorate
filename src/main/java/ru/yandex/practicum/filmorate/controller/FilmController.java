@@ -1,71 +1,89 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping
+@RequestMapping("/films")
 @Slf4j
 public class FilmController {
 
-    public HashMap<Integer, Film> films = new HashMap<>();
-    public int genId = 0;
+    private final FilmService filmService;
 
-    @GetMapping(value = "/films")
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
+
+    @GetMapping
     public List<Film> findAll() {
-        return new ArrayList<>(films.values());
+        return filmService.findAll();
     }
 
-    @PostMapping(value = "/films")
+    @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        validate(film);
-        genId++;
-        if (film.getId() == 0) {
-            film.setId(genId);
-        }
-        films.put(film.getId(), film);
-        log.info("Film c id " + film.getId() + " добавлен.");
-        return film;
+        return filmService.create(film);
     }
 
-    @PutMapping(value = "/films")
+    @PutMapping
     public Film update(@RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
-            validate(film);
-            films.put(film.getId(), film);
-            log.info("Film c id " + film.getId() + " обновлен.");
-        } else {
-            log.error("Не существует фильма с id " + film.getId());
-            throw new ValidationException("Не существует фильма с id " + film.getId());
-        }
-        return film;
+        return filmService.update(film);
     }
 
-    private void validate(Film film) throws ValidationException {
-        /*if (film.getName() == null || film.getName().isEmpty()) {
-            log.error("Название не может быть пустым");
-            throw new ValidationException("Название не может быть пустым");
-        }*/
-        /*if (film.getDescription().length() > 200) {
-            log.error("Максимальная длина описания — 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов");
-        }*/
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Дата релиза — не раньше 28 декабря 1895 года");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() < 0) {
-            log.error("Продолжительность фильма должна быть положительной");
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
-        }
+    @GetMapping("/{id}")
+    public Film get(@PathVariable Integer id) throws ValidationException {
+        return filmService.get(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
+        filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count) {
+        return filmService.popular(count);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(final ValidationException e) {
+        return new ErrorResponse(
+                "Ошибка валидации", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(final NullPointerException e) {
+        return new ErrorResponse(
+                "Объект не найден", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(final Exception e) {
+        return new ErrorResponse(
+                "Возникло исключение", e.getMessage()
+        );
     }
 
 }
