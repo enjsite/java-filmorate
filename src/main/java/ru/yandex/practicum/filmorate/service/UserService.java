@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage){
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage){
         this.userStorage = userStorage;
     }
 
@@ -44,11 +46,7 @@ public class UserService {
     }
 
     public User update(User user) throws ValidationException {
-        User curUser = get(user.getId());
-        if (curUser != null) {
-            validate(user);
-            userStorage.update(user);
-        }
+        userStorage.update(user);
         return user;
     }
 
@@ -65,40 +63,22 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-        User user = get(userId);
-        User friend = get(friendId);
-        userStorage.addFriend(user, friend);
+            userStorage.addFriend(userId, friendId);
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
-        User user = get(userId);
-        User friend = get(friendId);
-        userStorage.deleteFriend(user, friend);
+        userStorage.deleteFriend(userId, friendId);
     }
 
     public List<User> getFriends(Integer id) {
-        User user = get(id);
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId: user.getFriends()) {
-            friends.add(get(friendId));
-        }
+
+        var friends = userStorage.getFriends(id);
         return friends;
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
 
-        User user = get(id);
-        User otherUser = get(otherId);
-        List<User> commonFriends = new ArrayList<>();
-
-        Set<Integer> result = user.getFriends().stream()
-                .filter(otherUser.getFriends()::contains)
-                .collect(Collectors.toSet());
-
-        for (Integer friendId: result) {
-            commonFriends.add(get(friendId));
-        }
-
+        var commonFriends = userStorage.getCommonFriends(id, otherId);
         return commonFriends;
     }
 

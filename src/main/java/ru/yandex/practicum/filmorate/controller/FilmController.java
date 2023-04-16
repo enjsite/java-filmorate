@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -32,6 +35,11 @@ public class FilmController {
         return filmService.findAll();
     }
 
+    /*@GetMapping
+    public ResponseEntity<List<Film>> findAllNew() {
+        return ResponseEntity.ok(filmService.findAll());
+    }*/
+
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
         return filmService.create(film);
@@ -43,8 +51,8 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film get(@PathVariable Integer id) throws ValidationException {
-        return filmService.get(id);
+    public ResponseEntity<Film> get(@PathVariable Integer id) throws ValidationException {
+        return ResponseEntity.ok(filmService.get(id));
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -79,8 +87,25 @@ public class FilmController {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(final EmptyResultDataAccessException e) {
+        return new ErrorResponse(
+                "Объект не найден", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(final DataIntegrityViolationException e) {
+        return new ErrorResponse(
+                "Объект не найден", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(final Exception e) {
+        System.out.println(e.getMessage() + " " + e.toString());
         return new ErrorResponse(
                 "Возникло исключение", e.getMessage()
         );
