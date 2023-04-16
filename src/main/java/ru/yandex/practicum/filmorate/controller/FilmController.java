@@ -12,11 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
