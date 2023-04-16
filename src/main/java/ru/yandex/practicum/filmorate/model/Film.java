@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -10,6 +11,7 @@ import java.util.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Film {
 
     private int id;
@@ -26,7 +28,6 @@ public class Film {
     private List<Integer> likes;
 
     private List<Genre> genres;
-    //private List<Genre> genres;
 
     private Rating mpa;
 
@@ -37,8 +38,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
     }
-
-    public Film(){}
 
     public Film(String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
         this.name = name;
