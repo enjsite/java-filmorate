@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Film {
@@ -25,9 +24,9 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
 
-    private List<Integer> likes;
+    private List<Integer> likes = new ArrayList<>();
 
-    private List<Genre> genres;
+    private List<Genre> genres = new ArrayList<>();
 
     private Rating mpa;
 

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -75,11 +74,7 @@ public class FilmDbStorage implements FilmStorage {
         var id = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue();
         film.setId(id);
 
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                addGenreToFilm(film.getId(), genre.getId());
-            }
-        }
+        addGenresToFilm(film);
 
         return film;
     }
@@ -101,33 +96,39 @@ public class FilmDbStorage implements FilmStorage {
 
         jdbcTemplate.update("DELETE FROM films_genres WHERE film_id = ?", film.getId());
 
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                addGenreToFilm(film.getId(), genre.getId());
-            }
-        }
+        addGenresToFilm(film);
 
         return get(film.getId());
     }
 
-    private void addGenreToFilm(Integer filmId, Integer genreId) {
+    private void addGenresToFilm(Film film) {
 
-        try {
-            String sqlQuery = "SELECT * FROM films_genres WHERE film_id = ? AND genre_id = ?";
-            var genre = jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) -> rs.getInt(1), filmId, genreId);
-            System.out.println("!!!!! genre " + genre);
-        } catch (DataAccessException e) {
-            System.out.println("!!!! ничего не найдено для film_id, genre_id " + filmId + " " + genreId);
-            jdbcTemplate.update("INSERT INTO films_genres (film_id, genre_id) " +
-                    "VALUES (?, ?)", filmId, genreId);
+        if (film.getGenres().size() > 0) {
+            var genresToAdd = new HashSet<Integer>();
+            for (Genre genre : film.getGenres()) {
+                genresToAdd.add(genre.getId());
+            }
+            var genresIds = new ArrayList<>(genresToAdd);
+            StringBuilder sqlQueryGenres = new StringBuilder("INSERT INTO films_genres (film_id, genre_id)  VALUES");
+
+            for (int i = 0; i < genresIds.size(); i++) {
+                sqlQueryGenres.append(" (" + film.getId() + ", " + genresIds.get(i) + ")");
+                if (i < genresIds.size()-1) {
+                    sqlQueryGenres.append(",");
+                }
+            }
+
+            jdbcTemplate.update(sqlQueryGenres.toString());
         }
-
     }
 
     @Override
     public List<Film> findAll() {
 
-        var films = jdbcTemplate.query("SELECT f.id,\n" +
+        // основной запрос
+        // фильмы
+        Map<Integer, Film> films = new HashMap<>();
+        jdbcTemplate.query("SELECT f.id,\n" +
                 "       f.name,\n" +
                 "       f.description,\n" +
                 "       f.release_date,\n" +
@@ -135,21 +136,41 @@ public class FilmDbStorage implements FilmStorage {
                 "       f.mpa,\n" +
                 "       r.name\n" +
                 "FROM films AS f\n" +
-                "JOIN rating AS r ON f.mpa = r.id", (rs, rowNum) -> new Film(
+                "JOIN rating AS r ON f.mpa = r.id", (rs, rowNum) -> {
+
+            Film film = new Film(
                 rs.getInt(1),
                 rs.getString(2),
                 rs.getString(3),
                 rs.getDate(4).toLocalDate(),
                 rs.getInt(5),
-                new Rating(rs.getInt(6), rs.getString(7))
-        ));
+                new Rating(rs.getInt(6), rs.getString(7)));
+            films.put(film.getId(), film);
+            return film;
+        });
 
-        for (Film film: films) {
-            film.setGenres(getGenresByFilmId(film.getId()));
-            film.setLikes(getLikesByFilmId(film.getId()));
-        }
+        // жанры
+        jdbcTemplate.query("SELECT fg.film_id," +
+                "       fg.genre_id," +
+                "       g.name " +
+                "FROM films_genres fg " +
+                "JOIN genres g ON g.id = fg.genre_id", (rs, rowNum) -> {
+            Genre genre = new Genre(rs.getInt(2), rs.getString(3));
+            int fId = rs.getInt(1);
+            films.get(fId).getGenres().add(genre);
+            return genre;
+        });
 
-        return films;
+        // лайки
+        jdbcTemplate.query("SELECT l.user_id, l.film_id FROM likes AS l",
+                (rs, rowNum) -> {
+                    int like = rs.getInt(1);
+                    int fId = rs.getInt(2);
+                    films.get(fId).getLikes().add(like);
+                    return like;
+                });
+
+        return new ArrayList<>(films.values());
     }
 
     @Override

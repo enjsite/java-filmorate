@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -55,8 +57,8 @@ public class InMemoryUserStorage implements UserStorage {
     public void addFriend(Integer userId, Integer friendId) {
         User user = get(userId);
         User friend = get(friendId);
-        //user.getFriends().add(friend.getId());
-        //friend.getFriends().add(user.getId());
+        user.getFriends().add(friend);
+        friend.getFriends().add(user);
         update(user);
         update(friend);
     }
@@ -75,9 +77,9 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getFriends(Integer id) {
         User user = get(id);
         List<User> friends = new ArrayList<>();
-        /*for (Integer friendId: user.getFriends()) {
-            friends.add(get(friendId));
-        }*/
+        for (User friend: user.getFriends()) {
+            friends.add(get(friend.getId()));
+        }
         return friends;
     }
 
@@ -88,13 +90,13 @@ public class InMemoryUserStorage implements UserStorage {
         User otherUser = get(otherId);
         List<User> commonFriends = new ArrayList<>();
 
-        /*Set<Integer> result = user.getFriends().stream()
+        Set<User> result = user.getFriends().stream()
                 .filter(otherUser.getFriends()::contains)
                 .collect(Collectors.toSet());
 
-        for (Integer friendId: result) {
-            commonFriends.add(get(friendId));
-        }*/
+        for (User friend: result) {
+            commonFriends.add(get(friend.getId()));
+        }
 
         return commonFriends;
     }

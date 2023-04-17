@@ -36,12 +36,15 @@ public class UserService {
 
     public User create(User user) throws ValidationException {
         validate(user);
-        return userStorage.create(user);
+        var newUser = userStorage.create(user);
+        log.info("Создан новый пользователь с Id " + newUser.getId());
+        return newUser;
     }
 
     public User update(User user) throws ValidationException {
-        userStorage.update(user);
-        return user;
+        var updatedUser = userStorage.update(user);
+        log.info("Пользователь " + updatedUser.getId() + " обновлен.");
+        return updatedUser;
     }
 
     public void validate(User user) throws ValidationException {
@@ -65,13 +68,11 @@ public class UserService {
     }
 
     public List<User> getFriends(Integer id) {
-
         var friends = userStorage.getFriends(id);
         return friends;
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-
         var commonFriends = userStorage.getCommonFriends(id, otherId);
         return commonFriends;
     }

@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -22,19 +20,13 @@ public class GenreController {
 
     @GetMapping
     public List<Genre> findAll() {
+        log.info("Запрос на получение списка жанров");
         return genreService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Genre> get(@PathVariable Integer id) throws ValidationException {
+        log.info("Получить информацию о жанре id " + id);
         return ResponseEntity.ok(genreService.get(id));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final EmptyResultDataAccessException e) {
-        return new ErrorResponse(
-                "Объект не найден", e.getMessage()
-        );
     }
 }

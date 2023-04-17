@@ -39,11 +39,15 @@ public class FilmService {
 
     public Film create(Film film) throws ValidationException {
         validate(film);
-        return filmStorage.create(film);
+        var newFilm = filmStorage.create(film);
+        log.info("Создан новый фильм с id " + newFilm.getId());
+        return newFilm;
     }
 
     public Film update(Film film) throws ValidationException {
-        return filmStorage.update(film);
+        var updatedFilm = filmStorage.update(film);
+        log.info("Фильм " + updatedFilm.getId() + " обновлен.");
+        return updatedFilm;
     }
 
     public void validate(Film film) throws ValidationException {
@@ -59,12 +63,15 @@ public class FilmService {
 
     public void addLike(Integer filmId, Integer userId) {
         filmStorage.addLike(filmId, userId);
+        log.info("Добавлен лайк фильму " + filmId + " от пользователя " + userId);
     }
 
     public void deleteLike(Integer filmId, Integer userId) {
         if (!filmStorage.deleteLike(filmId, userId)) {
+            log.error("Невозможно удалить лайк, не существует фильм id " + filmId + " или пользователь " + userId);
             throw new NullPointerException();
         }
+        log.info("Лайк фильму " + filmId + " удален.");
     }
 
     public List<Film> popular(Integer count) {

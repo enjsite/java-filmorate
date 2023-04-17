@@ -45,11 +45,16 @@ class FilmorateApplicationTests {
 	@Test
 	public void createUser() {
 
-		User user = new User("Maria", "masha@gmail.com", "mashas",
+		User user = new User("MariaNew", "masha@gmail.com", "mashas",
 				LocalDate.of(2000,1,1));
 		userStorage.create(user);
 
-		assertTrue(userStorage.findAll().contains(user));
+		var uNames = new ArrayList<>();
+		for (User u : userStorage.findAll()) {
+			uNames.add(u.getName());
+		}
+
+		assertTrue(uNames.contains(user.getName()));
 	}
 
 	@Test
