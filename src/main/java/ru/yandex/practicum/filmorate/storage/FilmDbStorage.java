@@ -113,7 +113,7 @@ public class FilmDbStorage implements FilmStorage {
 
             for (int i = 0; i < genresIds.size(); i++) {
                 sqlQueryGenres.append(" (" + film.getId() + ", " + genresIds.get(i) + ")");
-                if (i < genresIds.size()-1) {
+                if (i < genresIds.size() - 1) {
                     sqlQueryGenres.append(",");
                 }
             }
