@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.exception;
 
-public class ValidationException extends Exception {
+import lombok.NoArgsConstructor;
 
-    public ValidationException() {
-    }
+@NoArgsConstructor
+public class ValidationException extends Exception {
 
     public ValidationException(String message) {
         super(message);

@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -26,66 +24,49 @@ public class UserController {
 
     @GetMapping
     public List<User> findAll() {
-         return userService.findAll();
+        log.info("Получен запрос на получение списка всех пользователей.");
+        return userService.findAll();
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
+        log.info("Получен запрос на создание нового пользователя.");
         return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) throws ValidationException {
+        log.info("Получен запрос на апдейт юзера с id " + user.getId());
         return userService.update(user);
     }
 
     @GetMapping("/{id}")
     public User get(@PathVariable Integer id) throws ValidationException {
+        log.info("Запрос на получение юзера с id " + id);
         return userService.get(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws ValidationException {
+        log.info("Получен запрос на добавление friendId " + friendId + " юзеру " + id);
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws ValidationException {
+        log.info("Получен запрос на удаление friendId " + friendId + " у юзера " + id);
         userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Integer id) throws ValidationException {
+        log.info("Получен запрос на получение списка друзей юзера " + id);
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) throws ValidationException {
+        log.info("Получен запрос на получение списка общих друзей юзера " + id + " и " + otherId);
         return userService.getCommonFriends(id, otherId);
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handle(final ValidationException e) {
-        return new ErrorResponse(
-                "Ошибка валидации", e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final NullPointerException e) {
-        return new ErrorResponse(
-                "Объект не найден", e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(final Exception e) {
-        return new ErrorResponse(
-                "Возникло исключение", e.getMessage()
-        );
-    }
-
 }

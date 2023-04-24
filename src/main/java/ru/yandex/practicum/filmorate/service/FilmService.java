@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
@@ -39,16 +39,15 @@ public class FilmService {
 
     public Film create(Film film) throws ValidationException {
         validate(film);
-        return filmStorage.create(film);
+        var newFilm = filmStorage.create(film);
+        log.info("Создан новый фильм с id " + newFilm.getId());
+        return newFilm;
     }
 
     public Film update(Film film) throws ValidationException {
-        Film curFilm = get(film.getId());
-        if (curFilm != null) {
-            validate(film);
-            filmStorage.update(film);
-        }
-        return film;
+        var updatedFilm = filmStorage.update(film);
+        log.info("Фильм " + updatedFilm.getId() + " обновлен.");
+        return updatedFilm;
     }
 
     public void validate(Film film) throws ValidationException {
@@ -63,17 +62,20 @@ public class FilmService {
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        Film film = get(filmId);
-        filmStorage.addLike(film, userId);
+        filmStorage.addLike(filmId, userId);
+        log.info("Добавлен лайк фильму " + filmId + " от пользователя " + userId);
     }
 
     public void deleteLike(Integer filmId, Integer userId) {
-        Film film = get(filmId);
-        filmStorage.deleteLike(film, userId);
+        if (!filmStorage.deleteLike(filmId, userId)) {
+            log.error("Невозможно удалить лайк, не существует фильм id " + filmId + " или пользователь " + userId);
+            throw new NullPointerException();
+        }
+        log.info("Лайк фильму " + filmId + " удален.");
     }
 
     public List<Film> popular(Integer count) {
-        List<Film> films = findAll();
+        var films = findAll();
 
         TreeSet<Film> filmSortedSet = new TreeSet<>((film1, film2) ->
                 film1.getLikes().size() <= film2.getLikes().size() ? 1 : -1);

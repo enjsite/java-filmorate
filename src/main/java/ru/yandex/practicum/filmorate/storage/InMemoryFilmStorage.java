@@ -50,18 +50,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Film film, Integer userId) {
+    public void addLike(Integer filmId, Integer userId) {
+        Film film = get(filmId);
         film.getLikes().add(userId);
         update(film);
     }
 
     @Override
-    public void deleteLike(Film film, Integer userId) {
+    public boolean deleteLike(Integer filmId, Integer userId) {
+        Film film = get(filmId);
         if (!film.getLikes().contains(userId)) {
             log.error("Не существует лайка от пользователя с id " + userId);
             throw new NullPointerException("Не существует лайка от пользователя с id " + userId);
         }
-        film.getLikes().remove(userId);
+        var res = film.getLikes().remove(userId);
         update(film);
+        return res;
     }
 }
