@@ -34,6 +34,10 @@ public class UserService {
         return user;
     }
 
+    public void removeUser(Integer id) {
+        userStorage.removeUser(id);
+    }
+
     public User create(User user) throws ValidationException {
         validate(user);
         var newUser = userStorage.create(user);

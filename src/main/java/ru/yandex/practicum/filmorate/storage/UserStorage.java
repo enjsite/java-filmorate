@@ -12,9 +12,9 @@ public interface UserStorage {
 
     User update(User user);
 
-    List<User> findAll();
+    void removeUser(Integer id);
 
-    void delete(Integer id);
+    List<User> findAll();
 
     void addFriend(Integer userId, Integer friendId);
 

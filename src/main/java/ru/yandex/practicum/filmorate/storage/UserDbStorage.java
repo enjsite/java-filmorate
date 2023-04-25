@@ -68,6 +68,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public void removeUser(Integer id) {
+        String sqlQuery = "DELETE FROM users WHERE id = " + id;
+        jdbcTemplate.update(sqlQuery);
+    }
+
+    @Override
     public List<User> findAll() {
 
         var users = jdbcTemplate.query("SELECT u.id,\n" +
@@ -83,11 +89,6 @@ public class UserDbStorage implements UserStorage {
                 rs.getDate(5).toLocalDate()));
 
         return users;
-    }
-
-    @Override
-    public void delete(Integer id) {
-
     }
 
     @Override
