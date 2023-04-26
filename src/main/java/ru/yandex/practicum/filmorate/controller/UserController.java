@@ -41,9 +41,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void removeUser(@PathVariable Integer id) {
+    public void removeUserById(@PathVariable Integer id) {
         log.info("Запрос на удалени пользователя {}", id);
-        userService.removeUser(id);
+        userService.removeUserById(id);
     }
 
     @GetMapping("/{id}")

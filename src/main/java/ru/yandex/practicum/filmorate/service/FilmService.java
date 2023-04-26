@@ -50,6 +50,11 @@ public class FilmService {
         return updatedFilm;
     }
 
+    public void removeFilmById(Integer id) {
+        log.info("Фильм {} удален", id);
+        filmStorage.removeFilmById(id);
+    }
+
     public void validate(Film film) throws ValidationException {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Дата релиза — не раньше 28 декабря 1895 года");

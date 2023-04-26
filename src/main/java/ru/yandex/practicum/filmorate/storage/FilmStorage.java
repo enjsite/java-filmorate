@@ -13,7 +13,7 @@ public interface FilmStorage {
 
     List<Film> findAll();
 
-    void delete(Integer id);
+    void removeFilmById(Integer id);
 
     void addLike(Integer filmId, Integer userId);
 

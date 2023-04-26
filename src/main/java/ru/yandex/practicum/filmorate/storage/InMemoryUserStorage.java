@@ -26,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void removeUser(Integer id) {
+    public void removeUserById(Integer id) {
         log.debug("Пользователь с идентификатором {} удалён.", id);
         if (!users.get(id).getFriends().isEmpty()) {
             for (User friend : users.get(id).getFriends()) {
