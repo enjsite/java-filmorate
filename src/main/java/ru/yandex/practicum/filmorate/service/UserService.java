@@ -34,8 +34,9 @@ public class UserService {
         return user;
     }
 
-    public void removeUser(Integer id) {
-        userStorage.removeUser(id);
+    public void removeUserById(Integer id) {
+        log.info("Удаление пользователя {}", id);
+        userStorage.removeUserById(id);
     }
 
     public User create(User user) throws ValidationException {

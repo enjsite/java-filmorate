@@ -47,6 +47,12 @@ public class FilmController {
         return ResponseEntity.ok(filmService.get(id));
     }
 
+    @DeleteMapping("/{id}")
+    public void removeFilmById(@PathVariable Integer id) {
+        log.debug("Получен запрос на удаление фильма номер {}", id);
+        filmService.removeFilmById(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
         log.info("Получен запрос на добавление лайка фильму с id " + id + " от пользователя " + userId);
