@@ -31,22 +31,22 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public List<Review> findAll() {
-        return jdbcTemplate.query("SELECT reviews.id AS id,\n" +
-                        "       reviews.content AS content,\n" +
-                        "       reviews.is_positive AS is_positive,\n" +
-                        "       reviews.user_id AS user_id,\n" +
-                        "       reviews.film_id AS film_id,\n" +
-                        "       SUM(CASE\n" +
-                        "               WHEN review_likes.is_like = TRUE THEN 1\n" +
-                        "               WHEN review_likes.is_like = FALSE THEN -1\n" +
-                        "               ELSE 0\n" +
-                        "           END) AS useful\n" +
-                        "FROM REVIEWS\n" +
-                        "LEFT JOIN review_likes ON reviews.id = review_likes.review_id\n" +
-                        "GROUP BY reviews.id\n" +
-                        "ORDER BY useful DESC"
-                ,
-                (rs, rowNum) -> makeReview(rs));
+        String sqlQuery = "SELECT reviews.id AS id,\n" +
+                "       reviews.content AS content,\n" +
+                "       reviews.is_positive AS is_positive,\n" +
+                "       reviews.user_id AS user_id,\n" +
+                "       reviews.film_id AS film_id,\n" +
+                "       SUM(CASE\n" +
+                "               WHEN review_likes.is_like = TRUE THEN 1\n" +
+                "               WHEN review_likes.is_like = FALSE THEN -1\n" +
+                "               ELSE 0\n" +
+                "           END) AS useful\n" +
+                "FROM REVIEWS\n" +
+                "LEFT JOIN review_likes ON reviews.id = review_likes.review_id\n" +
+                "GROUP BY reviews.id\n" +
+                "ORDER BY useful DESC";
+
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeReview(rs));
     }
 
 
