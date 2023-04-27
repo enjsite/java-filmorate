@@ -139,12 +139,12 @@ public class FilmDbStorage implements FilmStorage {
                 "JOIN rating AS r ON f.mpa = r.id", (rs, rowNum) -> {
 
             Film film = new Film(
-                rs.getInt(1),
-                rs.getString(2),
-                rs.getString(3),
-                rs.getDate(4).toLocalDate(),
-                rs.getInt(5),
-                new Rating(rs.getInt(6), rs.getString(7)));
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getDate(4).toLocalDate(),
+                    rs.getInt(5),
+                    new Rating(rs.getInt(6), rs.getString(7)));
             films.put(film.getId(), film);
             return film;
         });
@@ -188,4 +188,58 @@ public class FilmDbStorage implements FilmStorage {
     public boolean deleteLike(Integer filmId, Integer userId) {
         return jdbcTemplate.update("DELETE FROM likes WHERE film_id = ? AND user_id = ?", filmId, userId) > 0;
     }
+
+    @Override
+    public List<Film> getRecommendations(Integer id) {
+        String sqlQuery = "SELECT FILM_ID\n" +
+                "     FROM LIKES\n" +
+                "     WHERE USER_ID IN\n" +
+                "         (SELECT id\n" +
+                "          FROM\n" +
+                "            (SELECT u.id AS id,\n" +
+                "                    COUNT(common_likes.cnt) AS cnt2\n" +
+                "             FROM USERS u\n" +
+                "             LEFT JOIN\n" +
+                "               (SELECT USER_ID,\n" +
+                "                       COUNT(FILM_ID) AS cnt\n" +
+                "                FROM LIKES l\n" +
+                "                WHERE (l.FILM_ID IN\n" +
+                "                         (SELECT FILM_ID\n" +
+                "                          FROM LIKES\n" +
+                "                          WHERE USER_ID = ?))\n" +
+                "                  AND (USER_ID <> ?)\n" +
+                "                GROUP BY USER_ID\n" +
+                "                ORDER BY cnt DESC) AS common_likes ON u.ID = common_likes.user_id\n" +
+                "             GROUP BY u.id\n" +
+                "             ORDER BY cnt2 DESC) AS user_cnt\n" +
+                "          WHERE cnt2 =\n" +
+                "              (SELECT MAX(CNT2)\n" +
+                "               FROM\n" +
+                "                 (SELECT u.id AS id,\n" +
+                "                         COUNT(common_likes.cnt) AS cnt2\n" +
+                "                  FROM USERS u\n" +
+                "                  LEFT JOIN\n" +
+                "                    (SELECT USER_ID,\n" +
+                "                            COUNT(FILM_ID) AS cnt\n" +
+                "                     FROM LIKES l\n" +
+                "                     WHERE (l.FILM_ID IN\n" +
+                "                              (SELECT FILM_ID\n" +
+                "                               FROM LIKES\n" +
+                "                               WHERE USER_ID = ?))\n" +
+                "                       AND (USER_ID <> ?)\n" +
+                "                     GROUP BY USER_ID\n" +
+                "                     ORDER BY cnt DESC) AS common_likes ON u.ID = common_likes.user_id\n" +
+                "                  GROUP BY u.id\n" +
+                "                  ORDER BY cnt2 DESC) AS user_cnt))\n" +
+                "     EXCEPT SELECT film_id\n" +
+                "     FROM LIKES\n" +
+                "     WHERE USER_ID = ?";
+
+        List<Integer> filmIds = jdbcTemplate.queryForList(sqlQuery, Integer.class,
+                id, id, id, id, id);
+        List<Film> films = new ArrayList<>();
+        filmIds.forEach(userId -> films.add(get(userId)));
+        return films;
+    }
+
 }

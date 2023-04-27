@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
@@ -16,9 +18,13 @@ public class UserService {
 
     private final UserStorage userStorage;
 
+    private final FilmStorage filmStorage;
+
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
     }
 
     public List<User> findAll() {
@@ -60,7 +66,7 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-            userStorage.addFriend(userId, friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
@@ -75,6 +81,10 @@ public class UserService {
     public List<User> getCommonFriends(Integer id, Integer otherId) {
         var commonFriends = userStorage.getCommonFriends(id, otherId);
         return commonFriends;
+    }
+
+    public List<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
     }
 
 }
