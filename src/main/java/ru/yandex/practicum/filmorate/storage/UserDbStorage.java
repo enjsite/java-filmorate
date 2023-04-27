@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -95,7 +96,7 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(Integer userId, Integer friendId) {
 
         jdbcTemplate.update("INSERT INTO friendship (user_id, friend_id) " +
-                        "VALUES (?, ?)", userId, friendId);
+                "VALUES (?, ?)", userId, friendId);
     }
 
     @Override
@@ -106,6 +107,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(Integer id) {
+
+        String checkQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
+        if (jdbcTemplate.queryForObject(checkQuery, Integer.class, id) == 0) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден");
+        }
         String sqlQuery = "SELECT u.id, u.name, u.email, u.login, u.birthday" +
                 " FROM friendship AS fs " +
                 "JOIN users as u ON fs.friend_id = u.id " +
