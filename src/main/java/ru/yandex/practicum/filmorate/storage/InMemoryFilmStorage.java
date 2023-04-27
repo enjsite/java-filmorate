@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -66,5 +68,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         var res = film.getLikes().remove(userId);
         update(film);
         return res;
+    }
+
+    @Override
+    public List<Film> getRecommendations(Integer id) {
+        return new ArrayList<>();
     }
 }
