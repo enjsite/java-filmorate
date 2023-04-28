@@ -37,7 +37,6 @@ public class ReviewService {
     }
 
     public List<Review> getList(int filmId, int count) {
-
         if (filmId == -1) {
             return reviewStorage.getList(count);
         } else {
@@ -48,7 +47,7 @@ public class ReviewService {
     public Review get(int id) {
         Review review = reviewStorage.get(id);
         if (review == null) {
-            throw new NotFoundException("Отзыв с id: " + id + " не найден");
+            throw new NotFoundException("Отзыв с id: " + id + " не найден.");
         }
         return review;
     }
@@ -58,10 +57,10 @@ public class ReviewService {
         return reviewStorage.update(review);
     }
 
-    public void deleteById(int id) throws ClassNotFoundException {
+    public void deleteById(int id) {
         // Проверка, есть ли что удалять
         if (reviewStorage.get(id) == null) {
-            throw new ClassNotFoundException("Отзыв с id: " + id + " не найден");
+            throw new NotFoundException("Отзыв с id: " + id + " не найден.");
         }
         reviewStorage.deleteById(id);
     }
@@ -89,23 +88,27 @@ public class ReviewService {
     private void validLikeRequest(int reviewId, int userId) {
         //Проверка есть ли такой reviewId
         if (get(reviewId) == null) {
-            throw new NotFoundException("Отзыв с id: " + reviewId + " не найден");
+            log.error("Отзыв с id: " + reviewId + " не найден.");
+            throw new NotFoundException("Отзыв с id: " + reviewId + " не найден.");
         }
         // Проверка есть ли такой пользователь
         if (userStorage.get(userId) == null) {
-            throw new NotFoundException("Пользователь с id: " + userId + " не найден");
+            log.error("Пользователь с id: " + userId + " не найден.");
+            throw new NotFoundException("Пользователь с id: " + userId + " не найден.");
         }
     }
 
     private void validExistFilmAndUser(Review review) {
         // Проверка есть ли такой пользователь
         if (userStorage.get(review.getUserId()) == null) {
-            throw new NotFoundException("Пользователь с id: " + review.getUserId() + " не найден");
+            log.error("Пользователь с id: " + review.getUserId() + " не найден.");
+            throw new NotFoundException("Пользователь с id: " + review.getUserId() + " не найден.");
         }
 
         // Проверка есть ли такой фильм
         if (filmStorage.get(review.getFilmId()) == null) {
-            throw new NotFoundException("Фильм с id " + review.getFilmId() + " не найден");
+            log.error("Фильм с id " + review.getFilmId() + " не найден.");
+            throw new NotFoundException("Фильм с id " + review.getFilmId() + " не найден.");
         }
     }
 
