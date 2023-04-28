@@ -24,6 +24,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getByDirectorSortedByYear(Integer directorId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getByDirectorSortedByLikes(Integer directorId) {
+        return null;
+    }
+
+    @Override
     public Film create(Film film) {
         genId++;
         if (film.getId() == 0) {

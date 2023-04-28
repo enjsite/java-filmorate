@@ -28,6 +28,8 @@ public class Film {
 
     private List<Genre> genres = new ArrayList<>();
 
+    private List<Director> directors = new ArrayList<>();
+
     private Rating mpa;
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
