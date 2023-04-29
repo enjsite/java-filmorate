@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 @Slf4j
@@ -24,7 +25,8 @@ public class ErrorHandler {
 
     @ExceptionHandler({NullPointerException.class,
             EmptyResultDataAccessException.class,
-            DataIntegrityViolationException.class})
+            DataIntegrityViolationException.class,
+            NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handle(final RuntimeException e) {
         log.error("Объект не найден: " + e.getMessage());
