@@ -72,4 +72,10 @@ public class FilmController {
         log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
         return filmService.popular(count);
     }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByYearAndLikes(@PathVariable Integer directorId, @RequestParam("sortBy") String value) {
+        log.info("Получен запрос на получение списка фильмов, сортированному по по количеству лайков или году выпуска.");
+        return filmService.getByYearAndLikes(directorId, value);
+    }
 }

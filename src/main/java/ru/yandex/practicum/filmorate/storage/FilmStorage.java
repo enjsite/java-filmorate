@@ -8,6 +8,10 @@ public interface FilmStorage {
 
     Film get(Integer id);
 
+    List<Film> getByDirectorSortedByYear(Integer directorId);
+
+    List<Film> getByDirectorSortedByLikes(Integer directorId);
+
     Film create(Film film);
 
     Film update(Film film);
