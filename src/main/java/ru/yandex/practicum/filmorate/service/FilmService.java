@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -19,9 +22,12 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
 
+    private final DirectorStorage directorStorage;
+
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
     }
 
     public List<Film> findAll() {
@@ -82,5 +88,22 @@ public class FilmService {
         filmSortedSet.addAll(films);
 
         return filmSortedSet.stream().limit(count).collect(Collectors.toList());
+    }
+
+    public List<Film> getByYearAndLikes(Integer directorId, String value) {
+        Director director = directorStorage.get(directorId);
+        if (director == null) {
+            log.error("Не существует режиссёра с id " + directorId);
+            throw new NullPointerException("Не существует режиссёра с id " + directorId);
+        }
+
+        if (Objects.equals(value, "year")) {
+            return filmStorage.getByDirectorSortedByYear(directorId);
+        } else if (Objects.equals(value, "likes")) {
+            return filmStorage.getByDirectorSortedByLikes(directorId);
+        } else {
+            log.error("Неверный параметр sortBy.");
+            throw new NullPointerException();
+        }
     }
 }
