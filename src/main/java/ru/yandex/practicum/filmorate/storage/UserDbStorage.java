@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -16,6 +17,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User get(Integer id) {
+
+        String checkQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
+        if (jdbcTemplate.queryForObject(checkQuery, Integer.class, id) == 0) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден");
+        }
 
         String sqlQuery = "SELECT " +
                 "u.id, " +
@@ -86,8 +92,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public void removeUserById(Integer id) {
+        String sqlQuery = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
@@ -105,6 +112,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(Integer id) {
+
+        String checkQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
+        if (jdbcTemplate.queryForObject(checkQuery, Integer.class, id) == 0) {
+            throw new NotFoundException("Пользователь с ID " + id + " не найден");
+        }
         String sqlQuery = "SELECT u.id, u.name, u.email, u.login, u.birthday" +
                 " FROM friendship AS fs " +
                 "JOIN users as u ON fs.friend_id = u.id " +

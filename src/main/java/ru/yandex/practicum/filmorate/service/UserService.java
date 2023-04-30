@@ -53,6 +53,11 @@ public class UserService {
         return updatedUser;
     }
 
+    public void removeUserById(Integer id) {
+        log.info("Удаление пользователя {}", id);
+        userStorage.removeUserById(id);
+    }
+
     public void validate(User user) throws ValidationException {
 
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {

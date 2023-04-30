@@ -41,6 +41,12 @@ public class UserController {
         return userService.update(user);
     }
 
+    @DeleteMapping("/{id}")
+    public void removeUserById(@PathVariable Integer id) {
+        log.info("Запрос на удаление пользователя {}", id);
+        userService.removeUserById(id);
+    }
+
     @GetMapping("/{id}")
     public User get(@PathVariable Integer id) throws ValidationException {
         log.info("Запрос на получение юзера с id " + id);
