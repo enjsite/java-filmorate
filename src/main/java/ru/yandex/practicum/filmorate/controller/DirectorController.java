@@ -39,11 +39,13 @@ public class DirectorController {
 
     @GetMapping
     public List<Director> getAll() {
+        log.info("Получить список всех режиссёров");
         return directorService.getAll();
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
+        log.info("Удалить режиссёра по id " + id);
         directorService.delete(id);
     }
 }

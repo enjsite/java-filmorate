@@ -46,7 +46,7 @@ public class FilmDbStorage implements FilmStorage {
 
         film.setGenres(getGenresByFilmId(id));
         film.setLikes(getLikesByFilmId(id));
-        film.setDirectors(getDirectorsByFilmId(id));
+        film.setDirectors(new HashSet<>(getDirectorsByFilmId(id)));
 
         return film;
     }
@@ -64,8 +64,8 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM films f " +
                 "JOIN rating AS r ON f.mpa = r.id " +
                 "JOIN films_directors AS fd ON fd.film_id = f.id " +
-                "WHERE fd.director_id = " + directorId +
-                " ORDER BY f.release_date ASC";
+                "WHERE fd.director_id = ? " +
+                "ORDER BY f.release_date ASC";
 
         List<Film> films = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> {
             Film film = new Film(
@@ -76,11 +76,11 @@ public class FilmDbStorage implements FilmStorage {
                     rs.getInt(5),
                     new Rating(rs.getInt(6), rs.getString(7)));
             return film;
-        });
+        }, directorId);
 
         films.forEach(film -> {
             film.setGenres(getGenresByFilmId(film.getId()));
-            film.setDirectors(getDirectorsByFilmId(film.getId()));
+            film.setDirectors(new HashSet<>(getDirectorsByFilmId(film.getId())));
         });
         return films;
     }
@@ -117,8 +117,7 @@ public class FilmDbStorage implements FilmStorage {
 
         films.forEach(film -> {
             film.setGenres(getGenresByFilmId(film.getId()));
-//            film.setLikes(getLikesByFilmId(film.getId()));
-            film.setDirectors(getDirectorsByFilmId(film.getId()));
+            film.setDirectors(new HashSet<>(getDirectorsByFilmId(film.getId())));
         });
         return films;
     }
@@ -166,12 +165,9 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(id);
 
         addGenresToFilm(film);
+        addDirectorsToFilm(film);
 
-        if (film.getDirectors() != null) {
-            addDirectorsToFilm(film);
-        }
-
-        return film;
+        return get(film.getId());
     }
 
     @Override
