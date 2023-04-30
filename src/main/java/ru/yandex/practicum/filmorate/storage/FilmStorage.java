@@ -21,4 +21,6 @@ public interface FilmStorage {
     boolean deleteLike(Integer filmId, Integer userId);
 
     List<Film> getRecommendations(Integer id);
+
+    List<Film> getCommonFilms(Integer userId, Integer friendId);
 }
