@@ -90,6 +90,10 @@ public class FilmService {
         return filmSortedSet.stream().limit(count).collect(Collectors.toList());
     }
 
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     public List<Film> getByYearAndLikes(Integer directorId, String value) {
         Director director = directorStorage.get(directorId);
         if (director == null) {

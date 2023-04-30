@@ -59,6 +59,14 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
+    @GetMapping("/common")
+    public List<Film> commonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) throws ValidationException {
+        String message = String.format("Получен запрос вывод общих фильмов с сортировкой по их популярности. " +
+                "Id пользователя %d, Id друга %d.", userId, friendId);
+        log.info(message);
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
     @GetMapping("/popular")
     public List<Film> popular(@RequestParam(defaultValue = "10") Integer count) {
         log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
