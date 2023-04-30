@@ -243,7 +243,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getCommonFilms(Integer userId, Integer friendId){
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         String sqlReq = "SELECT f.ID FROM FILMS AS f\n" +
                 "LEFT JOIN ( SELECT FILM_ID, COUNT(USER_ID) AS cnt FROM LIKES GROUP BY FILM_ID ) AS LIKESCOUNT\n" +
                 "ON f.ID = LIKESCOUNT.FILM_ID\n" +
