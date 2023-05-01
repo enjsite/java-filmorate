@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.SearchStorage;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -27,12 +28,17 @@ public class FilmService {
 
     private final UserStorage userStorage;
 
+    private final SearchStorage searchStorage;
+
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage,
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       DirectorStorage directorStorage,
+                       SearchStorage searchStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.directorStorage = directorStorage;
         this.userStorage = userStorage;
+        this.searchStorage = searchStorage;
     }
 
     public List<Film> findAll() {
@@ -133,5 +139,9 @@ public class FilmService {
             log.error("Неверный параметр sortBy.");
             throw new NullPointerException();
         }
+    }
+
+    public List<Film> getSearch(String query, String searchBy) {
+        return searchStorage.getSearch(query, searchBy);
     }
 }
