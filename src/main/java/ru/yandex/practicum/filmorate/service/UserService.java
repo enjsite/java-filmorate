@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -72,10 +72,22 @@ public class UserService {
 
     public void addFriend(Integer userId, Integer friendId) {
         userStorage.addFriend(userId, friendId);
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.FRIEND,
+                Operation.ADD,
+                userId,
+                friendId));
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
         userStorage.deleteFriend(userId, friendId);
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.FRIEND,
+                Operation.REMOVE,
+                userId,
+                friendId));
     }
 
     public List<User> getFriends(Integer id) {
@@ -92,4 +104,8 @@ public class UserService {
         return filmStorage.getRecommendations(userId);
     }
 
+    public List<Event> getFeedByUserId(Integer id) {
+        var user = get(id);
+        return userStorage.getFeedByUserId(id);
+    }
 }
