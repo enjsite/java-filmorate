@@ -1,0 +1,3 @@
+2023-05-01 00:12:58 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Ошибка преобразования данных при конвертации "BIGINT to TIMESTAMP"
+Data conversion error converting "BIGINT to TIMESTAMP" [22018-214]

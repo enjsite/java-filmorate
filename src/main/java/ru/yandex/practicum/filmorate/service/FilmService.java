@@ -5,11 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -24,10 +25,14 @@ public class FilmService {
 
     private final DirectorStorage directorStorage;
 
+    private final UserStorage userStorage;
+
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.directorStorage = directorStorage;
+        this.userStorage = userStorage;
     }
 
     public List<Film> findAll() {
@@ -74,6 +79,13 @@ public class FilmService {
 
     public void addLike(Integer filmId, Integer userId) {
         filmStorage.addLike(filmId, userId);
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.LIKE,
+                Operation.ADD,
+                userId,
+                filmId));
+
         log.info("Добавлен лайк фильму " + filmId + " от пользователя " + userId);
     }
 
@@ -82,6 +94,13 @@ public class FilmService {
             log.error("Невозможно удалить лайк, не существует фильм id " + filmId + " или пользователь " + userId);
             throw new NullPointerException();
         }
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.LIKE,
+                Operation.REMOVE,
+                userId,
+                filmId));
+
         log.info("Лайк фильму " + filmId + " удален.");
     }
 
