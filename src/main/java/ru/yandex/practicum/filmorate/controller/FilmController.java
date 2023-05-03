@@ -84,4 +84,10 @@ public class FilmController {
         log.info("Получен запрос на получение списка фильмов, сортированному по по количеству лайков или году выпуска.");
         return filmService.getByYearAndLikes(directorId, value);
     }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(@RequestParam String query, @RequestParam (value = "by") String searchBy) {
+        log.debug("Попытка поиска: query = {}, by = {}.", query, searchBy);
+        return filmService.getSearch(query, searchBy);
+    }
 }
