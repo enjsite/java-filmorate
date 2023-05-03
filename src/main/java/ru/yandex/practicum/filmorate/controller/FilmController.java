@@ -74,9 +74,19 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count) {
-        log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
-        return filmService.popular(count);
+    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count,
+                              @RequestParam(required = false) Integer genreId,
+                              @RequestParam(required = false) Integer year
+    ) throws ValidationException {
+        if (genreId == null & year == null) {
+            log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
+            return filmService.popular(count);
+        } else {
+            String message = String.format("Получен запрос на вывод %d самых популярных фильмов жанра %d за %d год.",
+                    count, genreId, year);
+            log.info(message);
+            return filmService.getPopularFilms(count, genreId, year);
+        }
     }
 
     @GetMapping("/director/{directorId}")
