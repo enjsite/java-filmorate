@@ -141,12 +141,12 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(Integer limit, Integer genreId, Integer year) throws ValidationException {
-        if (year < 1895) {
+        if (year != null) if (year < 1895) {
             log.error("Дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
 
-        if (genreStorage.get(genreId) == null) {
+        if (genreId != null) if (genreStorage.get(genreId) == null) {
             log.error("Не существует жанра с id " + genreId);
             throw new NullPointerException("Не существует жанра с id " + genreId);
         }
