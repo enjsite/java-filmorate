@@ -146,7 +146,7 @@ public class FilmService {
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
 
-        if (genreStorage.get(genreId) == null){
+        if (genreStorage.get(genreId) == null) {
             log.error("Не существует жанра с id " + genreId);
             throw new NullPointerException("Не существует жанра с id " + genreId);
         }
