@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.SearchStorage;
 
@@ -27,18 +28,21 @@ public class FilmService {
     private final DirectorStorage directorStorage;
 
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
 
     private final SearchStorage searchStorage;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        DirectorStorage directorStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage,
                        SearchStorage searchStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage) {
+                       GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.directorStorage = directorStorage;
         this.userStorage = userStorage;
         this.searchStorage = searchStorage;
+        this.genreStorage = genreStorage;
     }
 
     public List<Film> findAll() {
@@ -143,5 +147,24 @@ public class FilmService {
 
     public List<Film> getSearch(String query, String searchBy) {
         return searchStorage.getSearch(query, searchBy);
+    }
+
+    public List<Film> getPopularFilms(Integer limit, Integer genreId, Integer year) throws ValidationException {
+        if (year != null) if (year < 1895) {
+            log.error("Дата релиза — не раньше 28 декабря 1895 года");
+            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
+        }
+
+        if (genreId != null) if (genreStorage.get(genreId) == null) {
+            log.error("Не существует жанра с id " + genreId);
+            throw new NullPointerException("Не существует жанра с id " + genreId);
+        }
+
+        if (limit <= 0) {
+            log.error("Количество должно быть положительным");
+            throw new ValidationException("Количество должно быть положительным");
+        }
+
+        return filmStorage.getPopularFilms(limit, genreId, year);
     }
 }

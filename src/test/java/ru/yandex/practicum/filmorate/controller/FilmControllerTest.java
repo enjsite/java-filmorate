@@ -22,7 +22,8 @@ class FilmControllerTest {
     @BeforeEach
     void init() throws ValidationException {
 
-        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), null, null, null));
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(),
+                null, null, null, null));
 
         film1 = new Film(1, "Avatar", "Film description 1",
                 LocalDate.of(2000,1,1), 120, null);

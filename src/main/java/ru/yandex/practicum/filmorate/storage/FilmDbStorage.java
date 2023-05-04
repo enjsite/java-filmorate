@@ -395,4 +395,36 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public List<Film> getPopularFilms(Integer limit, Integer genreId, Integer year) {
+        String sqlReq = "SELECT f.ID FROM FILMS AS f\n" +
+                "LEFT JOIN ( SELECT FILM_ID, COUNT(USER_ID) AS cnt FROM LIKES GROUP BY FILM_ID ) AS LIKESCOUNT\n" +
+                "ON f.ID = LIKESCOUNT.FILM_ID\n";
+
+        if (genreId != null | year != null) {
+            sqlReq = sqlReq + "WHERE \n";
+            if (year != null) {
+                sqlReq = sqlReq + "YEAR(RELEASE_DATE) = ?";
+                if (genreId != null) sqlReq = sqlReq + " AND \n";
+                else sqlReq = sqlReq + "\n";
+            }
+            if (genreId != null) sqlReq = sqlReq + "ID IN ( SELECT FILM_ID FROM FILMS_GENRES WHERE GENRE_ID = ?)\n";
+        }
+
+        sqlReq = sqlReq + "ORDER BY LIKESCOUNT.cnt DESC \n" +
+                "LIMIT ?";
+
+        List<Integer> filmIds;
+        if (year != null & genreId != null)
+            filmIds = jdbcTemplate.queryForList(sqlReq, Integer.class, year, genreId, limit);
+        else if (year != null)
+            filmIds = jdbcTemplate.queryForList(sqlReq, Integer.class, year, limit);
+        else
+            filmIds = jdbcTemplate.queryForList(sqlReq, Integer.class, genreId, limit);
+
+        List<Film> films = new ArrayList<>();
+        filmIds.forEach(filmId -> films.add(get(filmId)));
+        return films;
+    }
+
 }
