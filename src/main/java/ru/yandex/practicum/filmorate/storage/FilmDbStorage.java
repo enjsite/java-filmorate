@@ -122,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
-    private List<Genre> getGenresByFilmId(int id) {
+    protected List<Genre> getGenresByFilmId(int id) {
         String sqlQuery = "SELECT fg.genre_id, g.name" +
                 " FROM films_genres AS fg " +
                 "JOIN genres as g ON fg.genre_id = g.id " +
@@ -142,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getInt(1), id);
     }
 
-    private List<Director> getDirectorsByFilmId(int id) {
+    protected List<Director> getDirectorsByFilmId(int id) {
         String sqlQuery = "SELECT fd.director_id, d.name" +
                 " FROM films_directors AS fd " +
                 "JOIN directors as d ON fd.director_id = d.id " +

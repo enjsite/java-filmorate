@@ -23,6 +23,7 @@ public class Film implements Comparable<Film> {
     private String description;
 
     private LocalDate releaseDate;
+
     private int duration;
 
     private List<Integer> likes = new ArrayList<>();

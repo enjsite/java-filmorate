@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.SearchStorage;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -29,14 +30,18 @@ public class FilmService {
     private final UserStorage userStorage;
     private final GenreStorage genreStorage;
 
+    private final SearchStorage searchStorage;
+
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        DirectorStorage directorStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage,
+                       SearchStorage searchStorage,
                        GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.directorStorage = directorStorage;
         this.userStorage = userStorage;
+        this.searchStorage = searchStorage;
         this.genreStorage = genreStorage;
     }
 
@@ -138,6 +143,10 @@ public class FilmService {
             log.error("Неверный параметр sortBy.");
             throw new NullPointerException();
         }
+    }
+
+    public List<Film> getSearch(String query, String searchBy) {
+        return searchStorage.getSearch(query, searchBy);
     }
 
     public List<Film> getPopularFilms(Integer limit, Integer genreId, Integer year) throws ValidationException {
