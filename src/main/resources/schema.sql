@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS events
     timestamp   LONG,
     event_type  VARCHAR(10) NOT NULL,
     operation   VARCHAR(10) NOT NULL,
-    user_id  	INTEGER REFERENCES users (id),
+    user_id  	INTEGER REFERENCES users (id) ON DELETE CASCADE,
     entity_id   INTEGER
 );
 
