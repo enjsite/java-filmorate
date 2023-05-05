@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -49,8 +50,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public void removeUserById(Integer id) {
+        log.debug("Пользователь с идентификатором {} удалён.", id);
+        if (!users.get(id).getFriends().isEmpty()) {
+            for (User friend : users.get(id).getFriends()) {
+                friend.getFriends().remove(users.get(id));
+            }
+        }
+        users.remove(id);
     }
 
     @Override
@@ -99,5 +106,15 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         return commonFriends;
+    }
+
+    @Override
+    public List<Event> getFeedByUserId(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Event createFeed(Event event) {
+        return null;
     }
 }
