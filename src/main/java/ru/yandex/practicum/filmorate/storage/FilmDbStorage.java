@@ -379,14 +379,17 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
-        String sqlReq = "SELECT f.ID FROM FILMS AS f\n" +
-                "LEFT JOIN ( SELECT FILM_ID, COUNT(USER_ID) AS cnt FROM LIKES GROUP BY FILM_ID ) AS LIKESCOUNT\n" +
-                "ON f.ID = LIKESCOUNT.FILM_ID\n" +
-                "WHERE f.ID IN\n" +
-                "(SELECT film_id FROM LIKES\n" +
-                "WHERE USER_ID = ? AND\n" +
-                "FILM_ID IN ( SELECT FILM_ID FROM LIKES WHERE USER_ID = ? ))\n" +
-                "ORDER BY LIKESCOUNT.cnt DESC";
+        String sqlReq = "SELECT FILMS.ID AS ID\n" +
+                "FROM FILMS\n" +
+                "LEFT JOIN LIKES ON\n" +
+                "FILMS.ID = LIKES.FILM_ID\n" +
+                "WHERE USER_ID = ?\n" +
+                "  AND (FILM_ID in\n" +
+                "         (SELECT film_id\n" +
+                "          FROM LIKES\n" +
+                "          WHERE USER_ID = ?))\n" +
+                "GROUP BY FILMS.ID\n" +
+                "ORDER BY COUNT(LIKES.USER_ID) DESC";
 
         List<Integer> filmIds = jdbcTemplate.queryForList(sqlReq, Integer.class,
                 userId, friendId);
