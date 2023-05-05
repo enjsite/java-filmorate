@@ -37,7 +37,7 @@ public class ReviewService {
 
     public Review create(Review review) {
         validExistFilmAndUser(review);
-        var createdReview =  reviewStorage.create(review);
+        var createdReview = reviewStorage.create(review);
 
         userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
                 EventType.REVIEW,
@@ -78,7 +78,7 @@ public class ReviewService {
         return updatedReview;
     }
 
-    public void deleteById(int id) {
+    public boolean deleteById(int id) {
         // Проверка, есть ли что удалять
         if (reviewStorage.get(id) == null) {
             throw new NotFoundException("Отзыв с id: " + id + " не найден.");
@@ -90,27 +90,27 @@ public class ReviewService {
                 reviewStorage.get(id).getUserId(),
                 id));
 
-        reviewStorage.deleteById(id);
+        return reviewStorage.deleteById(id);
     }
 
-    public void addLike(int reviewId, int userId) {
+    public boolean addLike(int reviewId, int userId) {
         validLikeRequest(reviewId, userId);
-        reviewStorage.addLike(reviewId, userId);
+        return reviewStorage.addLike(reviewId, userId);
     }
 
-    public void deleteLike(int reviewId, int userId) {
+    public boolean deleteLike(int reviewId, int userId) {
         validLikeRequest(reviewId, userId);
-        reviewStorage.deleteLike(reviewId, userId);
+        return reviewStorage.deleteLike(reviewId, userId);
     }
 
-    public void addDisLike(int reviewId, int userId) {
+    public boolean addDisLike(int reviewId, int userId) {
         validLikeRequest(reviewId, userId);
-        reviewStorage.addDisLike(reviewId, userId);
+        return reviewStorage.addDisLike(reviewId, userId);
     }
 
-    public void deleteDisLike(int reviewId, int userId) {
+    public boolean deleteDisLike(int reviewId, int userId) {
         validLikeRequest(reviewId, userId);
-        reviewStorage.deleteDisLike(reviewId, userId);
+        return reviewStorage.deleteDisLike(reviewId, userId);
     }
 
     private void validLikeRequest(int reviewId, int userId) {

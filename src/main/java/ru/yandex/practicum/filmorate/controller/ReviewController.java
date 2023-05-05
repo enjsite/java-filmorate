@@ -45,42 +45,38 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteById(@PathVariable Integer id) {
+    public boolean deleteById(@PathVariable Integer id) {
         log.info("Получен запрос на удаление отзыва с id: {}.", id);
-        reviewService.deleteById(id);
-        return "Review " + id + " deleted";
+        return reviewService.deleteById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public String addLike(@PathVariable Integer id, @PathVariable Integer userId) {
+    public boolean addLike(@PathVariable Integer id, @PathVariable Integer userId) {
         log.info("Получен запрос на добавление лайка" +
                 " для отзыва с id: {} от пользователя с id: {} ", id, userId);
-        reviewService.addLike(id, userId);
-        return "Лайк добавлен";
+        return reviewService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public String deleteLike(@PathVariable Integer id, @PathVariable Integer userId) {
+    public boolean deleteLike(@PathVariable Integer id, @PathVariable Integer userId) {
         log.info("Получен запрос на удаление лайка" +
                 " для отзыва с id: {} от пользователя с id: {} ", id, userId);
-        reviewService.deleteLike(id, userId);
-        return "Лайк удален";
+        return reviewService.deleteLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public String addDisLike(@PathVariable Integer id, @PathVariable Integer userId) {
+    public boolean addDisLike(@PathVariable Integer id, @PathVariable Integer userId) {
         log.info("Получен запрос на добавление дизлайка" +
                 " для отзыва с id: {} от пользователя с id: {} ", id, userId);
-        reviewService.addDisLike(id, userId);
-        return "Дизлайк добавлен";
+        return reviewService.addDisLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public String deleteDisLike(@PathVariable Integer id, @PathVariable Integer userId) {
+    public boolean deleteDisLike(@PathVariable Integer id, @PathVariable Integer userId) {
         log.info("Получен запрос на удаление дизлайка" +
                 " для отзыва с id: {} от пользователя с id: {} ", id, userId);
-        reviewService.deleteDisLike(id, userId);
-        return "Дизлайк удален";
+
+        return reviewService.deleteDisLike(id, userId);
     }
 
 }

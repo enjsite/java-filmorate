@@ -145,56 +145,66 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void deleteById(int id) {
+    public boolean deleteById(int id) {
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery, id);
+        int cntStr = jdbcTemplate.update(sqlQuery, id);
 
         log.info("Успшено удален отзыв с id: {}.", id);
+
+        return cntStr > 0;
     }
 
     @Override
-    public void addLike(int reviewId, int userId) {
+    public boolean addLike(int reviewId, int userId) {
         String sqlQuery = "INSERT INTO review_likes (review_id, user_id, is_like) " +
                 "VALUES (?, ?, true)";
 
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
+        int cntStr = jdbcTemplate.update(sqlQuery, reviewId, userId);
 
         log.info("Успшено добавлен лайк " +
                 "для отзыва с id: {} от пользователя {}.", reviewId, userId);
+
+        return cntStr > 0;
     }
 
     @Override
-    public void deleteLike(int reviewId, int userId) {
+    public boolean deleteLike(int reviewId, int userId) {
         String sqlQuery = "DELETE FROM review_likes " +
                 "WHERE review_id = ? AND user_id = ? ";
 
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
+        int cntStr = jdbcTemplate.update(sqlQuery, reviewId, userId);
 
         log.info("Успшено удален лайк " +
                 "для отзыва с id: {} от пользователя {}.", reviewId, userId);
+
+        return cntStr > 0;
     }
 
     @Override
-    public void addDisLike(int reviewId, int userId) {
+    public boolean addDisLike(int reviewId, int userId) {
         String sqlQuery = "INSERT INTO review_likes (review_id, user_id, is_like) " +
                 "VALUES (?, ?, false)";
 
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
+        int cntString = jdbcTemplate.update(sqlQuery, reviewId, userId);
 
         log.info("Успшено добавлен дизлайк " +
                 "для отзыва с id: {} от пользователя {}.", reviewId, userId);
+
+        return cntString > 0;
     }
 
     @Override
-    public void deleteDisLike(int reviewId, int userId) {
+    public boolean deleteDisLike(int reviewId, int userId) {
         String sqlQuery = "DELETE FROM review_likes " +
                 "WHERE review_id = ? AND user_id = ? ";
 
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
+        int cntStr = jdbcTemplate.update(sqlQuery, reviewId, userId);
 
         log.info("Успшено удален дизлайк " +
                 "для отзыва с id: {} от пользователя {}.", reviewId, userId);
+
+        return cntStr > 0;
     }
 
     private Review makeReview(ResultSet rs) throws SQLException {

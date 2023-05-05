@@ -19,13 +19,13 @@ public interface ReviewStorage {
 
     Review update(Review review);
 
-    void deleteById(int id);
+    boolean deleteById(int id);
 
-    void addLike(int reviewId, int userId);
+    boolean addLike(int reviewId, int userId);
 
-    void deleteLike(int reviewId, int userId);
+    boolean deleteLike(int reviewId, int userId);
 
-    void addDisLike(int reviewId, int userId);
+    boolean addDisLike(int reviewId, int userId);
 
-    void deleteDisLike(int reviewId, int userId);
+    boolean deleteDisLike(int reviewId, int userId);
 }
