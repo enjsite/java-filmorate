@@ -24,16 +24,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getByDirectorSortedByYear(Integer directorId) {
-        return null;
-    }
-
-    @Override
-    public List<Film> getByDirectorSortedByLikes(Integer directorId) {
-        return null;
-    }
-
-    @Override
     public Film create(Film film) {
         genId++;
         if (film.getId() == 0) {
@@ -57,8 +47,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void removeFilmById(Integer id) {
-        films.remove(id);
+    public void delete(Integer id) {
+
     }
 
     @Override
@@ -82,16 +72,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getRecommendations(Integer id) {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Film> getPopularFilms(Integer limit, Integer genreId, Integer year) {
         return new ArrayList<>();
     }
 }

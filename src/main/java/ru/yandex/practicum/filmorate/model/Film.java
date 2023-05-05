@@ -11,8 +11,7 @@ import java.util.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Film implements Comparable<Film> {
+public class Film {
 
     private int id;
 
@@ -23,14 +22,11 @@ public class Film implements Comparable<Film> {
     private String description;
 
     private LocalDate releaseDate;
-
     private int duration;
 
     private List<Integer> likes = new ArrayList<>();
 
     private List<Genre> genres = new ArrayList<>();
-
-    private Set<Director> directors = new HashSet<>();
 
     private Rating mpa;
 
@@ -67,10 +63,5 @@ public class Film implements Comparable<Film> {
         values.put("duration", duration);
         values.put("mpa", mpa.getId());
         return values;
-    }
-
-    @Override
-    public int compareTo(Film anotherFilm) {
-        return Integer.compare(this.id, anotherFilm.getId());
     }
 }

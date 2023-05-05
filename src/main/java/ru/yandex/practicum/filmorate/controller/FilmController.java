@@ -47,12 +47,6 @@ public class FilmController {
         return ResponseEntity.ok(filmService.get(id));
     }
 
-    @DeleteMapping("/{id}")
-    public void removeFilmById(@PathVariable Integer id) {
-        log.debug("Получен запрос на удаление фильма номер {}", id);
-        filmService.removeFilmById(id);
-    }
-
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Integer id, @PathVariable Integer userId) throws ValidationException {
         log.info("Получен запрос на добавление лайка фильму с id " + id + " от пользователя " + userId);
@@ -65,39 +59,9 @@ public class FilmController {
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/common")
-    public List<Film> commonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) throws ValidationException {
-        String message = String.format("Получен запрос вывод общих фильмов с сортировкой по их популярности. " +
-                "Id пользователя %d, Id друга %d.", userId, friendId);
-        log.info(message);
-        return filmService.getCommonFilms(userId, friendId);
-    }
-
     @GetMapping("/popular")
-    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count,
-                              @RequestParam(required = false) Integer genreId,
-                              @RequestParam(required = false) Integer year
-    ) throws ValidationException {
-        if (genreId == null & year == null) {
-            log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
-            return filmService.popular(count);
-        } else {
-            String message = String.format("Получен запрос на вывод %d самых популярных фильмов жанра %d за %d год.",
-                    count, genreId, year);
-            log.info(message);
-            return filmService.getPopularFilms(count, genreId, year);
-        }
-    }
-
-    @GetMapping("/director/{directorId}")
-    public List<Film> getByYearAndLikes(@PathVariable Integer directorId, @RequestParam("sortBy") String value) {
-        log.info("Получен запрос на получение списка фильмов, сортированному по по количеству лайков или году выпуска.");
-        return filmService.getByYearAndLikes(directorId, value);
-    }
-
-    @GetMapping("/search")
-    public List<Film> searchFilms(@RequestParam String query, @RequestParam (value = "by") String searchBy) {
-        log.debug("Попытка поиска: query = {}, by = {}.", query, searchBy);
-        return filmService.getSearch(query, searchBy);
+    public List<Film> popular(@RequestParam(defaultValue = "10") Integer count) {
+        log.info("Получен запрос на получение списка " + count + " самых популярных фильмов.");
+        return filmService.popular(count);
     }
 }

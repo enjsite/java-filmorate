@@ -5,15 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventType;
-import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -37,15 +33,7 @@ public class ReviewService {
 
     public Review create(Review review) {
         validExistFilmAndUser(review);
-        var createdReview =  reviewStorage.create(review);
-
-        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
-                EventType.REVIEW,
-                Operation.ADD,
-                createdReview.getUserId(),
-                createdReview.getId()));
-
-        return createdReview;
+        return reviewStorage.create(review);
     }
 
     public List<Review> getList(int filmId, int count) {
@@ -66,16 +54,7 @@ public class ReviewService {
 
     public Review update(Review review) {
         validExistFilmAndUser(review);
-
-        var updatedReview = reviewStorage.update(review);
-
-        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
-                EventType.REVIEW,
-                Operation.UPDATE,
-                updatedReview.getUserId(),
-                updatedReview.getId()));
-
-        return updatedReview;
+        return reviewStorage.update(review);
     }
 
     public void deleteById(int id) {
@@ -83,13 +62,6 @@ public class ReviewService {
         if (reviewStorage.get(id) == null) {
             throw new NotFoundException("Отзыв с id: " + id + " не найден.");
         }
-
-        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
-                EventType.REVIEW,
-                Operation.REMOVE,
-                reviewStorage.get(id).getUserId(),
-                id));
-
         reviewStorage.deleteById(id);
     }
 
