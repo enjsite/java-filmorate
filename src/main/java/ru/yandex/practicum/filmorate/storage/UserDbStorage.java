@@ -21,7 +21,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(Integer id) {
 
-        if(id == null ){
+        if (id == null) {
             throw new NullPointerException("id пользователя null.");
         }
 
@@ -108,7 +108,7 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(Integer userId, Integer friendId) {
 
         jdbcTemplate.update("INSERT INTO friendship (user_id, friend_id) " +
-                        "VALUES (?, ?)", userId, friendId);
+                "VALUES (?, ?)", userId, friendId);
     }
 
     @Override
