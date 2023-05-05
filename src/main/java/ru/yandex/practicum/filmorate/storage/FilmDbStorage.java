@@ -366,9 +366,10 @@ public class FilmDbStorage implements FilmStorage {
                 "                     ORDER BY cnt DESC) AS common_likes ON u.ID = common_likes.user_id\n" +
                 "                  GROUP BY u.id\n" +
                 "                  ORDER BY cnt2 DESC) AS user_cnt))\n" +
-                "     EXCEPT SELECT film_id\n" +
+                "  AND FILM_ID NOT IN\n" +
+                "    (SELECT FILM_ID\n" +
                 "     FROM LIKES\n" +
-                "     WHERE USER_ID = ?";
+                "     WHERE USER_ID = ?)";
 
         List<Integer> filmIds = jdbcTemplate.queryForList(sqlQuery, Integer.class,
                 id, id, id, id, id);
