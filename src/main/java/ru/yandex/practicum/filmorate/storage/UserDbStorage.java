@@ -21,6 +21,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(Integer id) {
 
+        if(id == null ){
+            throw new NullPointerException("id пользователя null.");
+        }
+
         String checkQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
         if (jdbcTemplate.queryForObject(checkQuery, Integer.class, id) == 0) {
             throw new NotFoundException("Пользователь с ID " + id + " не найден");
