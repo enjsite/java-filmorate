@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -16,9 +18,13 @@ public class UserService {
 
     private final UserStorage userStorage;
 
+    private final FilmStorage filmStorage;
+
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
     }
 
     public List<User> findAll() {
@@ -47,6 +53,11 @@ public class UserService {
         return updatedUser;
     }
 
+    public void removeUserById(Integer id) {
+        log.info("Удаление пользователя {}", id);
+        userStorage.removeUserById(id);
+    }
+
     public void validate(User user) throws ValidationException {
 
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
@@ -60,11 +71,23 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-            userStorage.addFriend(userId, friendId);
+        userStorage.addFriend(userId, friendId);
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.FRIEND,
+                Operation.ADD,
+                userId,
+                friendId));
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
         userStorage.deleteFriend(userId, friendId);
+
+        userStorage.createFeed(new Event(new Timestamp(System.currentTimeMillis()).getTime(),
+                EventType.FRIEND,
+                Operation.REMOVE,
+                userId,
+                friendId));
     }
 
     public List<User> getFriends(Integer id) {
@@ -77,4 +100,12 @@ public class UserService {
         return commonFriends;
     }
 
+    public List<Film> getRecommendations(int userId) {
+        return filmStorage.getRecommendations(userId);
+    }
+
+    public List<Event> getFeedByUserId(Integer id) {
+        var user = get(id);
+        return userStorage.getFeedByUserId(id);
+    }
 }

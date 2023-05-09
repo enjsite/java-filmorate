@@ -22,12 +22,13 @@ class FilmControllerTest {
     @BeforeEach
     void init() throws ValidationException {
 
-        filmController = new FilmController(new FilmService(new InMemoryFilmStorage()));
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(),
+                null, null, null, null));
 
         film1 = new Film(1, "Avatar", "Film description 1",
-                LocalDate.of(2000,1,1), 120, null);
+                LocalDate.of(2000, 1, 1), 120, null);
         film2 = new Film(2, "Titanic", "Film description 2",
-                LocalDate.of(2000,1,1), 120, null);
+                LocalDate.of(2000, 1, 1), 120, null);
 
         filmController.create(film1);
         filmController.create(film2);
@@ -44,8 +45,8 @@ class FilmControllerTest {
 
     @Test
     void create() throws ValidationException {
-        Film film = new Film(3,"Titanic", "Film description 2",
-                LocalDate.of(2000,1,1), 120, null);
+        Film film = new Film(3, "Titanic", "Film description 2",
+                LocalDate.of(2000, 1, 1), 120, null);
 
         filmController.create(film);
         assertTrue(filmController.findAll().contains(film));
@@ -53,8 +54,8 @@ class FilmControllerTest {
 
     @Test
     void createFailReleaseDate() {
-        Film film = new Film(3,"Test Film", "Description",
-                LocalDate.of(1890,1,1), 120, null);
+        Film film = new Film(3, "Test Film", "Description",
+                LocalDate.of(1890, 1, 1), 120, null);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Дата релиза — не раньше 28 декабря 1895 года", exception.getMessage());
@@ -63,11 +64,10 @@ class FilmControllerTest {
 
     @Test
     void createFailDuration() {
-        Film film = new Film(3,"Test Film", "Description",
-                LocalDate.of(1998,1,1), -200, null);
+        Film film = new Film(3, "Test Film", "Description",
+                LocalDate.of(1998, 1, 1), -200, null);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
-        //assertEquals();
         assertFalse(filmController.findAll().contains(film));
     }
 
@@ -88,10 +88,8 @@ class FilmControllerTest {
     void updateUnknown() throws ValidationException {
 
         Film filmUpd = new Film(9999, "Avatar", "Film description 1",
-                LocalDate.of(2000,1,1), 120, null);
+                LocalDate.of(2000, 1, 1), 120, null);
 
-        //NullPointerException exception = assertThrows(NullPointerException.class, () -> filmController.update(filmUpd));
-        //assertEquals("Не существует фильма с id 9999", exception.getMessage());
 
         List<Integer> ids = new ArrayList<>();
         for (Film film : filmController.findAll()) {
@@ -100,6 +98,5 @@ class FilmControllerTest {
 
         assertFalse(ids.contains(9999));
     }
-
 
 }
